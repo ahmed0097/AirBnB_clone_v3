@@ -15,18 +15,27 @@ from models.user import User
 @app_views.route('/status', methods=['GET'], strict_slashes=False)
 def status():
     """Status of API"""
-    return jsonify({"status: "OK"})
+    if request.method == "GET":
+        res = {"status: "OK"}
+    return jsonify(res)
 
 
 @app_views.route('/stats', methods=['GET'], strict_slashes=False)
 def obj_number():
-    """retrieves the number of each objects by type"""
-    classes = ["Amenity", "City", "Places", "reviews", "states", "users"]
-    names = ["amenities", "cities", "places", "reviews", "states", "users"]
+    """returns the count for all objects"""
+    all_counts = {
+        "amenities": storage.count(Amenity),
+        "cities": storage.count(City),
+        "places": storage.count(Place),
+        "reviews": storage.count(Review),
+        "states": storage.count(State),
+        "users": storage.count(User)
+    }
+    return jsonify(all_counts)
 
-    object_number() = {}
-    for i in range(len(classes)):
-        object_number[names[i]] = storage.count(classes[i])
-
-
-return jsonify(object_number)
+@app_views.app_errorhandler(404)
+def not_found(e):
+    """Page not found."""
+    response = {"error": "Not found"}
+    return jsonify(response), e.code
+    
